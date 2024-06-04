@@ -1,20 +1,20 @@
 {
   "development": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "sql12711362",
+    "password": "MBUeahNW9l",
+    "database": "sql12711362",
+    "host": "sql12.freesqldatabase.com"
   },
   "test": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "sql12711362",
+    "password": "MBUeahNW9l",
+    "database": "sql12711362",
+    "host": "sql12.freesqldatabase.com"
   },
   "production": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "sql12711362",
+    "password": "MBUeahNW9l",
+    "database": "sql12711362",
+    "host": "sql12.freesqldatabase.com"
   }
 }
