@@ -21,7 +21,7 @@ router.post(
       if (!req.body.path || !req.body.title) {
         res.status(400).send({
           status: 0,
-          msg: "The title and path is required",
+          message: "The title and path is required",
         });
       } else {
         Menu.create({
@@ -219,7 +219,7 @@ router.delete(
       .then((rolePerm) => {
         if (!req.params.id) {
           res.status(400).send({
-            msg: "Please pass Menu ID.",
+            message: "Please pass Menu ID.",
           });
         } else {
           Menu.findByPk(req.params.id)

@@ -23,7 +23,7 @@ router.post(
         if (!req.body.name) {
           res.status(400).send({
             status: 0,
-            msg: "The name field is required",
+            message: "The name field is required",
           });
         } else {
           Permission.create({
@@ -309,7 +309,7 @@ router.delete(
       .then((rolePerm) => {
         if (!req.params.id) {
           res.status(400).send({
-            msg: "Please pass permission ID.",
+            message: "Please pass permission ID.",
           });
         } else {
           Permission.findByPk(req.params.id)

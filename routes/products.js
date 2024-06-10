@@ -13,7 +13,7 @@ router.post('/', passport.authenticate('jwt', {
     helper.checkPermission(req.user.role_id, 'product_add').then((rolePerm) => {
         if (!req.body.prod_name || !req.body.prod_description || !req.body.prod_image || !req.body.prod_price) {
             res.status(400).send({
-                msg: 'Please pass Product name, description, image or price.'
+                message: 'Please pass Product name, description, image or price.'
             })
         } else {
             Product
@@ -73,7 +73,7 @@ router.put('/:id', passport.authenticate('jwt', {
     helper.checkPermission(req.user.role_id, 'product_update').then((rolePerm) => {
         if (!req.body.prod_name || !req.body.prod_description || !req.body.prod_image || !req.body.prod_price) {
             res.status(400).send({
-                msg: 'Please pass Product name, description, image or price.'
+                message: 'Please pass Product name, description, image or price.'
             })
         } else {
             Product
@@ -110,7 +110,7 @@ router.delete('/:id', passport.authenticate('jwt', {
     helper.checkPermission(req.user.role_id, 'product_delete').then((rolePerm) => {
         if (!req.params.id) {
             res.status(400).send({
-                msg: 'Please pass product ID.'
+                message: 'Please pass product ID.'
             })
         } else {
             Product

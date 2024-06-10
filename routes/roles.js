@@ -54,7 +54,7 @@ router.post(
           } catch (error) {
             return res.status(400).send({
               success: false,
-              msg: error.message,
+              message: error.message,
             });
           }
         }
@@ -263,7 +263,7 @@ router.get(
       .catch((error) => {
         res.status(400).send({
           success: false,
-          msg: error,
+          message: error,
         });
       });
   }
@@ -284,7 +284,7 @@ router.post(
       // Check if Role ID is provided
       if (!req.params.id) {
         return res.status(400).send({
-          msg: "Please pass Role ID.",
+          message: "Please pass Role ID.",
         });
       }
 
@@ -341,7 +341,7 @@ router.post(
       } else {
         return res.status(500).send({
           success: false,
-          msg: error.message || "An error occurred",
+          message: error.message || "An error occurred",
         });
       }
     }
@@ -360,7 +360,7 @@ router.delete(
 
       if (!req.params.id) {
         return res.status(400).send({
-          msg: "Please pass role ID.",
+          message: "Please pass role ID.",
         });
       }
 
@@ -390,7 +390,7 @@ router.delete(
       if (!res.headersSent) {
         return res.status(500).send({
           success: false,
-          msg: error.message || "An error occurred",
+          message: error.message || "An error occurred",
         });
       }
     }

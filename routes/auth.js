@@ -49,7 +49,7 @@ router.post("/login", upload.none(), function (req, res) {
         } else {
           res.status(400).send({
             status: 0,
-            msg: "Wrong password.",
+            message: "Wrong password.",
           });
         }
       });

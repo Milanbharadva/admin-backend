@@ -23,7 +23,7 @@ router.post(
 
       if (!roles || !email || !password || !username) {
         return res.status(400).send({
-          msg: "Please pass Role ID, email, password, and username.",
+          message: "Please pass Role ID, email, password, and username.",
         });
       }
 
@@ -245,7 +245,7 @@ router.post(
       // Check if Role ID is provided
       if (!req.params.id) {
         return res.status(400).send({
-          msg: "Please pass User ID.",
+          message: "Please pass User ID.",
         });
       }
 
@@ -291,7 +291,7 @@ router.post(
       } else {
         return res.status(500).send({
           success: false,
-          msg: error.message || "An error occurred",
+          message: error.message || "An error occurred",
         });
       }
     }
@@ -310,7 +310,7 @@ router.delete(
       .then((rolePerm) => {
         if (!req.params.id) {
           res.status(400).send({
-            msg: "Please pass user ID.",
+            message: "Please pass user ID.",
           });
         } else {
           User.findByPk(req.params.id)
