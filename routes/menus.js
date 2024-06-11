@@ -18,6 +18,7 @@ router.post(
   upload.none(),
   function (req, res) {
     helper.checkPermission(req.user.role_id, "Menu Create").then(() => {
+      console.log(req.user.role_id);
       if (!req.body.path || !req.body.title) {
         res.status(400).send({
           status: 0,
@@ -31,7 +32,7 @@ router.post(
           path: req.body.path,
           sort_order: req.body.sort_order,
           status: req.body.status,
-          role_id: req.body.roles[0],
+          role_id: req.body.roles[0] || 1,
         })
           .then((perm) =>
             res.status(200).send({
@@ -98,11 +99,14 @@ router.post(
     helper
       .checkPermission(req.user.role_id, "Menu List")
       .then(() => {
-        const sortColumn = req.body.sort_column || "id";
-        const sortBy = req.body.sort_by || "asc";
-
         Menu.findAndCountAll({
-          order: [[sortColumn, sortBy.toUpperCase()]],
+          order: [["sort_order", "asc"]],
+          attributes: {
+            exclude: ["is_admin", "status", "created_at", "updated_at"],
+          },
+          where: {
+            status: 1,
+          },
         })
           .then((result) => {
             const menus = result.rows;
@@ -113,12 +117,14 @@ router.post(
               }
               menuMap[menu.parent_id].push(menu.dataValues);
             });
+
             const buildMenuTree = (parentId) => {
               return (menuMap[parentId] || []).map((menu) => ({
                 ...menu,
                 sub_menus: buildMenuTree(menu.id),
               }));
             };
+
             const combinedMenus = buildMenuTree(0);
             res.status(200).send({
               status: 1,
@@ -147,10 +153,29 @@ router.post(
       });
   }
 );
+function updateMenuItems(items) {
+  items.forEach((item) => {
+    Menu.update(
+      {
+        parent_id: item.parent_id,
+        sort_order: item.sort_order,
+      },
+      {
+        where: {
+          id: item.id,
+        },
+      }
+    );
+
+    if (item.children && item.children.length > 0) {
+      updateMenuItems(item.children); // Recursively update children
+    }
+  });
+}
 
 // Update a Menu
 router.post(
-  "/update/:id",
+  "/update",
   passport.authenticate("jwt", {
     session: false,
   }),
@@ -159,51 +184,13 @@ router.post(
     helper
       .checkPermission(req.user.role_id, "Menu Edit")
       .then(() => {
-        Menu.findByPk(req.params.id)
-          .then((perm) => {
-            if (!perm) {
-              return res.status(400).send({
-                status: 0,
-                message: "Menu does not exist",
-              });
-            }
-            Menu.update(
-              {
-                parent_id: req.body.parent_id || perm.parent_id,
-                title: req.body.title || perm.title,
-                icon: req.body.icon || perm.icon,
-                path: req.body.path || perm.path,
-                sort_order: req.body.sort_order || perm.sort_order,
-                status: req.body.status || perm.status,
-                role_id: req.body.roles[0] || perm.roles[0],
-              },
-              {
-                where: {
-                  id: req.params.id,
-                },
-              }
-            )
-              .then((_) => {
-                if (_[0] === 1)
-                  res.status(200).send({
-                    status: 1,
-                    message: "Menu updated successfully.",
-                  });
-                else
-                  res.status(400).send({
-                    status: 0,
-                    message: "Error In Update",
-                  });
-              })
-              .catch((err) => res.status(400).send(err));
-          })
-          .catch((error) => {
-            res.status(400).send(error);
-          });
+        updateMenuItems(req.body);
+        res.status(200).send({
+          status: 1,
+          message: "Menu updated successfully.",
+        });
       })
-      .catch((error) => {
-        res.status(403).send(error);
-      });
+      .catch((err) => res.status(400).send(err));
   }
 );
 
