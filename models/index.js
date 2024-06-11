@@ -15,7 +15,8 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, {
     dialect: "mysql",
     dialectModule: require("mysql2"),
-    host: config.host, 
+    host: config.host,
+    port: config.port, // Add this line to include the port configuration
   });
 }
 

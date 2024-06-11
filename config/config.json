@@ -1,20 +1,23 @@
 {
   "development": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "test_darkshout",
+    "password": "da504e324b4ca9d34a9c076eeca371a136e1d0c5",
+    "database": "test_darkshout",
+    "host": "l4w.h.filess.io",
+    "port": 3307
   },
   "test": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "test_darkshout",
+    "password": "da504e324b4ca9d34a9c076eeca371a136e1d0c5",
+    "database": "test_darkshout",
+    "host": "l4w.h.filess.io",
+    "port": 3307
   },
   "production": {
-    "username": "root",
-    "password": "root",
-    "database": "test",
-    "host": "localhost"
+    "username": "test_darkshout",
+    "password": "da504e324b4ca9d34a9c076eeca371a136e1d0c5",
+    "database": "test_darkshout",
+    "host": "l4w.h.filess.io",
+    "port": 3307
   }
 }

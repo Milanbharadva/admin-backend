@@ -168,7 +168,7 @@ function updateMenuItems(items) {
     );
 
     if (item.children && item.children.length > 0) {
-      updateMenuItems(item.children); // Recursively update children
+      updateMenuItems(item.children);
     }
   });
 }
