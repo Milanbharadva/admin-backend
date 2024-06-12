@@ -32,7 +32,7 @@ router.post(
           path: req.body.path,
           sort_order: req.body.sort_order,
           status: req.body.status,
-          role_id: req.body.roles[0] || 1,
+          role_id: req.body.roles || 1,
         })
           .then((perm) =>
             res.status(200).send({
