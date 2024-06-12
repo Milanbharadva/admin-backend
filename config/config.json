@@ -1,23 +1,20 @@
 {
   "development": {
-    "username": "freedb_admin-root",
-    "password": "Kg?TQ9VBAJ!MpFP",
-    "database": "freedb_admin-test",
-    "host": "sql.freedb.tech",
-    "port": 3306
+    "username": "root",
+    "password": "root",
+    "database": "test",
+    "host": "localhost"
   },
   "test": {
-    "username": "freedb_admin-root",
-    "password": "Kg?TQ9VBAJ!MpFP",
-    "database": "freedb_admin-test",
-    "host": "sql.freedb.tech",
-    "port": 3306
+    "username": "root",
+    "password": "root",
+    "database": "test",
+    "host": "localhost"
   },
   "production": {
-    "username": "freedb_admin-root",
-    "password": "Kg?TQ9VBAJ!MpFP",
-    "database": "freedb_admin-test",
-    "host": "sql.freedb.tech",
-    "port": 3306
+    "username": "root",
+    "password": "root",
+    "database": "test",
+    "host": "localhost"
   }
 }

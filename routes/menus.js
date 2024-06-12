@@ -153,12 +153,12 @@ router.post(
       });
   }
 );
-function updateMenuItems(items) {
-  items.forEach((item) => {
+function updateMenuItems(items, rootid) {
+  items.map((item, index) => {
     Menu.update(
       {
-        parent_id: item.parent_id,
-        sort_order: item.sort_order,
+        parent_id: rootid,
+        sort_order: index,
       },
       {
         where: {
@@ -166,9 +166,8 @@ function updateMenuItems(items) {
         },
       }
     );
-
     if (item.children && item.children.length > 0) {
-      updateMenuItems(item.children);
+      updateMenuItems(item.children, item.id);
     }
   });
 }
@@ -181,10 +180,11 @@ router.post(
   }),
   upload.none(),
   function (req, res) {
+    console.log(req.body);
     helper
       .checkPermission(req.user.role_id, "Menu Edit")
       .then(() => {
-        updateMenuItems(req.body);
+        updateMenuItems(req.body, 0);
         res.status(200).send({
           status: 1,
           message: "Menu updated successfully.",
