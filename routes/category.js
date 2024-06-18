@@ -63,12 +63,13 @@ router.get(
     helper
       .checkPermission(req.user.role_id, "Single Category Get")
       .then((rolePerm) => {
-        Category.findByPk(req.params.id)
+        Category.findByPk(req.params.id, {
+          attributes: { exclude: ["created_at", "updated_at"] },
+        })
           .then((Category) => {
             if (Category)
               res.status(200).send({
                 status: 1,
-                message: "",
                 data: {
                   ...Category.dataValues,
                 },
@@ -189,6 +190,65 @@ router.post(
         });
       })
       .catch((err) => res.status(400).send(err));
+  }
+);
+// Update a Category
+router.post(
+  "/edit/:id",
+  passport.authenticate("jwt", {
+    session: false,
+  }),
+  upload.none(),
+  function (req, res) {
+    helper
+      .checkPermission(req.user.role_id, "Category Edit")
+      .then(() => {
+        if (!req.params.id || !req.body.path) {
+          res.status(400).send({
+            status: 0,
+            message: "The path field is required.",
+          });
+        } else {
+          Category.findByPk(req.params.id)
+            .then((category) => {
+              if (!category) {
+                return res.status(400).send({
+                  status: 0,
+                  message: "Category does not exist",
+                });
+              }
+              Category.update(
+                {
+                  ...req.body,
+                },
+                {
+                  where: {
+                    id: req.params.id,
+                  },
+                }
+              )
+                .then((_) => {
+                  if (_)
+                    res.status(200).send({
+                      status: 1,
+                      message: "Category updated successfully.",
+                    });
+                  else
+                    res.status(400).send({
+                      status: 0,
+                      message: "Error In Update",
+                    });
+                })
+                .catch((err) => res.status(400).send(err));
+            })
+            .catch((error) => {
+              res.status(400).send(error);
+            });
+        }
+      })
+      .catch((error) => {
+        res.status(403).send(error);
+      });
   }
 );
 
