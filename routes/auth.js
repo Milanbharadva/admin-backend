@@ -65,9 +65,8 @@ router.get(
   function (req, res) {
     const sortColumn = req.body.sort_column || "id";
     const sortBy = req.body.sort_by || "asc";
-
     // Fetch user data with role and permissions
-    const userPromise = User.findByPk(req.user.role_id, {
+    const userPromise = User.findByPk(req.user.id, {
       attributes: ["id", "name", "username", "email", "phone", "avatar"],
       include: [
         {
@@ -91,7 +90,7 @@ router.get(
 
     // Fetch menu data and construct the hierarchy
     const menuPromise = Menu.findAndCountAll({
-      order: [[sortColumn, sortBy.toUpperCase()]],
+      order: [["sort_order", "asc"]],
       attributes: {
         exclude: ["is_admin", "status", "created_at", "updated_at"],
       },

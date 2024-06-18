@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Menu = require("../models").Menu;
+const Category = require("../models").Category;
 const passport = require("passport");
 require("../config/passport")(passport);
 const Helper = require("../utils/helper");
@@ -9,7 +9,7 @@ const multer = require("multer");
 const upload = multer(); // This will handle form-data without file uploads
 const { Op } = require("sequelize");
 
-// Create a new Menu
+// Create a new Category
 router.post(
   "/create",
   passport.authenticate("jwt", {
@@ -17,14 +17,14 @@ router.post(
   }),
   upload.none(),
   function (req, res) {
-    helper.checkPermission(req.user.role_id, "Menu Create").then(() => {
+    helper.checkPermission(req.user.role_id, "Category Create").then(() => {
       if (!req.body.path || !req.body.title) {
         res.status(400).send({
           status: 0,
           message: "The title and path is required",
         });
       } else {
-        Menu.create({
+        Category.create({
           parent_id: req.body.parent_id,
           title: req.body.title,
           icon: req.body.icon,
@@ -36,7 +36,7 @@ router.post(
           .then((perm) =>
             res.status(200).send({
               status: 1,
-              message: "Menu created successfully",
+              message: "Category created successfully",
             })
           )
           .catch((error) => {
@@ -61,23 +61,22 @@ router.get(
   }),
   function (req, res) {
     helper
-      .checkPermission(req.user.role_id, "Single Menu Get")
+      .checkPermission(req.user.role_id, "Single Category Get")
       .then((rolePerm) => {
-        Menu.findByPk(req.params.id, {
-          attributes: { exclude: ["created_at", "updated_at"] },
-        })
-          .then((Menu) => {
-            if (Menu)
+        Category.findByPk(req.params.id)
+          .then((Category) => {
+            if (Category)
               res.status(200).send({
                 status: 1,
+                message: "",
                 data: {
-                  ...Menu.dataValues,
+                  ...Category.dataValues,
                 },
               });
             else
               res.status(400).send({
                 status: 0,
-                message: "Menu does not exist",
+                message: "Category does not exist",
               });
           })
           .catch((error) => {
@@ -97,9 +96,9 @@ router.post(
   upload.none(),
   function (req, res) {
     helper
-      .checkPermission(req.user.role_id, "Menu List")
+      .checkPermission(req.user.role_id, "Category List")
       .then(() => {
-        Menu.findAndCountAll({
+        Category.findAndCountAll({
           order: [["sort_order", "asc"]],
           attributes: {
             exclude: ["is_admin", "status", "created_at", "updated_at"],
@@ -109,36 +108,36 @@ router.post(
           },
         })
           .then((result) => {
-            const menus = result.rows;
-            const menuMap = {};
-            menus.forEach((menu) => {
-              if (!menuMap[menu.parent_id]) {
-                menuMap[menu.parent_id] = [];
+            const categories = result.rows;
+            const categoryMap = {};
+            categories.forEach((category) => {
+              if (!categoryMap[category.parent_id]) {
+                categoryMap[category.parent_id] = [];
               }
-              menuMap[menu.parent_id].push(menu.dataValues);
+              categoryMap[category.parent_id].push(category.dataValues);
             });
 
-            const buildMenuTree = (parentId) => {
-              return (menuMap[parentId] || []).map((menu) => ({
-                ...menu,
-                sub_menus: buildMenuTree(menu.id),
+            const buildCategoryTree = (parentId) => {
+              return (categoryMap[parentId] || []).map((category) => ({
+                ...category,
+                sub_menus: buildCategoryTree(category.id),
               }));
             };
 
-            const combinedMenus = buildMenuTree(0);
+            const combinedCategories = buildCategoryTree(0);
             res.status(200).send({
               status: 1,
               message: "",
               data: {
-                records: combinedMenus,
+                records: combinedCategories,
               },
             });
           })
           .catch((error) => {
-            console.error("Error fetching menus:", error);
+            console.error("Error fetching categories:", error);
             res.status(400).send({
               status: 0,
-              message: "Error fetching menus",
+              message: "Error fetching categories",
               error: error.message,
             });
           });
@@ -153,9 +152,9 @@ router.post(
       });
   }
 );
-function updateMenuItems(items, rootid) {
+function updateCategoryItems(items, rootid) {
   items.map((item, index) => {
-    Menu.update(
+    Category.update(
       {
         parent_id: rootid,
         sort_order: index,
@@ -167,12 +166,12 @@ function updateMenuItems(items, rootid) {
       }
     );
     if (item.children && item.children.length > 0) {
-      updateMenuItems(item.children, item.id);
+      updateCategoryItems(item.children, item.id);
     }
   });
 }
 
-// Update a Menu
+// Update a Category
 router.post(
   "/update",
   passport.authenticate("jwt", {
@@ -181,78 +180,19 @@ router.post(
   upload.none(),
   function (req, res) {
     helper
-      .checkPermission(req.user.role_id, "Menu Edit")
+      .checkPermission(req.user.role_id, "Category Edit")
       .then(() => {
-        updateMenuItems(req.body, 0);
+        updateCategoryItems(req.body, 0);
         res.status(200).send({
           status: 1,
-          message: "Menu updated successfully.",
+          message: "Category updated successfully.",
         });
       })
       .catch((err) => res.status(400).send(err));
   }
 );
-// Update a Menu
-router.post(
-  "/edit/:id",
-  passport.authenticate("jwt", {
-    session: false,
-  }),
-  upload.none(),
-  function (req, res) {
-    helper
-      .checkPermission(req.user.role_id, "Menu Edit")
-      .then(() => {
-        if (!req.params.id || !req.body.path) {
-          res.status(400).send({
-            status: 0,
-            message: "The path field is required.",
-          });
-        } else {
-          Menu.findByPk(req.params.id)
-            .then((menu) => {
-              if (!menu) {
-                return res.status(400).send({
-                  status: 0,
-                  message: "Menu does not exist",
-                });
-              }
-              Menu.update(
-                {
-                  ...req.body,
-                },
-                {
-                  where: {
-                    id: req.params.id,
-                  },
-                }
-              )
-                .then((_) => {
-                  if (_)
-                    res.status(200).send({
-                      status: 1,
-                      message: "Menu updated successfully.",
-                    });
-                  else
-                    res.status(400).send({
-                      status: 0,
-                      message: "Error In Update",
-                    });
-                })
-                .catch((err) => res.status(400).send(err));
-            })
-            .catch((error) => {
-              res.status(400).send(error);
-            });
-        }
-      })
-      .catch((error) => {
-        res.status(403).send(error);
-      });
-  }
-);
 
-// Delete a Menu
+// Delete a Category
 router.delete(
   "/delete/:id",
   passport.authenticate("jwt", {
@@ -260,19 +200,19 @@ router.delete(
   }),
   function (req, res) {
     helper
-      .checkPermission(req.user.role_id, "Menu Delete")
+      .checkPermission(req.user.role_id, "Category Delete")
       .then((rolePerm) => {
         if (!req.params.id) {
           res.status(400).send({
-            message: "Please pass Menu ID.",
+            message: "Please pass Category ID.",
           });
         } else {
-          Menu.findByPk(req.params.id)
+          Category.findByPk(req.params.id)
             .then((perm) => {
               if (!perm) {
                 return res.status(400).send({
                   status: 0,
-                  message: "Menu does not exist!",
+                  message: "Category does not exist!",
                 });
               }
               perm
@@ -284,7 +224,7 @@ router.delete(
                 .then((_) => {
                   res.status(200).send({
                     status: 1,
-                    message: "Menu deleted",
+                    message: "Category deleted",
                   });
                 })
                 .catch((err) => res.status(400).send(err));

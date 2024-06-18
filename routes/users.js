@@ -18,45 +18,48 @@ router.post(
   }),
   upload.none(),
   function (req, res) {
-    helper.checkPermission(req.user.role_id, "User Create").then(() => {
-      const { roles, email, password, username, ...optionalFields } = req.body;
+    helper
+      .checkPermission(req.user.role_id, "User Create")
+      .then(() => {
+        const { roles, email, password, username, ...optionalFields } =
+          req.body;
 
-      if (!roles || !email || !password || !username) {
-        return res.status(400).send({
-          message: "Please pass Role ID, email, password, and username.",
+        if (!roles || !email || !password || !username) {
+          return res.status(400).send({
+            message: "Please pass Role ID, email, password, and username.",
+          });
+        }
+
+        const userData = {
+          email,
+          password,
+          username,
+          role_id: roles[0],
+          ...optionalFields,
+        };
+
+        User.create(userData)
+          .then(() =>
+            res.status(200).send({
+              status: 1,
+              message: "User created successfully",
+            })
+          )
+          .catch((error) => {
+            if (error.name == "SequelizeUniqueConstraintError") {
+              res.status(400).send({
+                status: 0,
+                message: "The username has already been taken.",
+              });
+            }
+          });
+      })
+      .catch((error) => {
+        res.status(403).send({
+          status: 0,
+          message: error.message || "Permission denied.",
         });
-      }
-
-      const userData = {
-        email,
-        password,
-        username,
-        role_id: roles[0],
-        ...optionalFields,
-      };
-
-      User.create(userData)
-        .then(() =>
-          res.status(200).send({
-            status: 1,
-            message: "User created successfully",
-          })
-        )
-        .catch((error) => {
-          if (error.name == "SequelizeUniqueConstraintError") {
-            res.status(400).send({
-              status: 0,
-              message: "The username has already been taken.",
-            });
-          }
-        });
-    });
-    // .catch((error) => {
-    //   res.status(403).send({
-    //     status: 0,
-    //     message: error.message || "Permission denied.",
-    //   });
-    // });
+      });
   }
 );
 

@@ -11,6 +11,7 @@ var permsRouter = require("./routes/permissions");
 var authRouter = require("./routes/auth");
 var productRouter = require("./routes/products");
 var menuRouter = require("./routes/menus");
+var categoryRouter = require("./routes/category");
 var globalconfigsRouter = require("./routes/globalconfigs");
 const bodyParser = require("body-parser");
 const { title } = require("process");
@@ -39,6 +40,7 @@ app.use("/api/admin/roles", rolesRouter);
 app.use("/api/admin/permissions", permsRouter);
 app.use("/api/admin/products", productRouter);
 app.use("/api/admin/menus", menuRouter);
+app.use("/api/admin/categories", categoryRouter);
 app.use("/api/admin", globalconfigsRouter);
 
 // catch 404 and forward to error handler
